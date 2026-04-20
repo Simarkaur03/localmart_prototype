@@ -95,7 +95,7 @@ const ProductManagement = () => {
     }
   };
    
-  const loading = storeLoading || productsLoading;
+  const loading = storeLoading || productsLoading || loadingAction;
 
   return (
     <div className="flex w-full min-h-screen bg-slate-50">

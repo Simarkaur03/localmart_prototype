@@ -24,7 +24,7 @@ const OwnerDashboard = () => {
   const navigate = useNavigate();
 
   // Queries
-  const { data: storeData, isLoading: storeLoading, refetch: refetchStore } = useOwnerStore(user?.id);
+  const { data: storeData, isLoading: storeLoading } = useOwnerStore(user?.id);
   const store = storeData?.data;
 
   const { data: ordersData, isLoading: ordersLoading, refetch: refetchOrders } = useOwnerOrders(store?.id);

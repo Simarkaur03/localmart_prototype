@@ -30,11 +30,7 @@ const StoreProfile = () => {
     is_active: true
   });
 
-  useEffect(() => {
-    if (user) fetchStore();
-  }, [user]);
-
-  const fetchStore = async () => {
+  const fetchStore = useCallback(async () => {
     try {
       const { data, error } = await storeService.getStoreByOwner(user.id);
       if (error) throw new Error(error);
@@ -44,7 +40,11 @@ const StoreProfile = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (user) fetchStore();
+  }, [user, fetchStore]);
 
   const handleSave = async (e) => {
     e.preventDefault();

@@ -25,7 +25,7 @@ const LoginPage = () => {
       if (error) throw error;
 
       // 2. Fetch Profile to get role
-      const { data: profile, error: profileError } = await fetchProfile(data.user.id);
+      const { data: profile } = await fetchProfile(data.user.id);
       
       // Even if profile is missing, our hardened fetchProfile provides a default
       const userRole = profile?.role || 'customer';

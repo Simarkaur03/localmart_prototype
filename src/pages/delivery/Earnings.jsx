@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../../lib/supabase';
-import { useStore } from '../../store/useStore';
 import { 
   ArrowLeft, 
   TrendingUp, 
@@ -22,7 +20,6 @@ import {
   ResponsiveContainer,
   Cell
 } from 'recharts';
-import toast from 'react-hot-toast';
 
 const mockData = [
   { day: 'Mon', amount: 450 },
@@ -35,14 +32,9 @@ const mockData = [
 ];
 
 const Earnings = () => {
-  const { user, profile } = useStore();
   const navigate = useNavigate();
   const [earnings, setEarnings] = useState([]);
   const [totalEarnings, setTotalEarnings] = useState(0);
-
-  useEffect(() => {
-    fetchEarnings();
-  }, []);
 
   const fetchEarnings = async () => {
     // In real app, query delivery_assignments with partner_id and status='delivered'
@@ -50,6 +42,10 @@ const Earnings = () => {
     setEarnings(mockData);
     setTotalEarnings(mockData.reduce((acc, curr) => acc + curr.amount, 0));
   };
+
+  useEffect(() => {
+    fetchEarnings();
+  }, []);
 
   return (
     <div className="mobile-container flex flex-col h-full bg-slate-50 no-scrollbar overflow-y-auto font-outfit">

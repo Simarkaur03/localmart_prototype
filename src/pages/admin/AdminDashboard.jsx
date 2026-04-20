@@ -12,11 +12,8 @@ import {
   Bell,
   Search,
   CheckCircle2,
-  XCircle,
-  MoreVertical,
   Loader2,
-  TrendingUp,
-  TrendingDown
+  TrendingUp
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -31,11 +28,7 @@ const AdminDashboard = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchAdminStats();
-  }, []);
-
-  const fetchAdminStats = async () => {
+  const fetchAdminStats = useCallback(async () => {
     try {
       const { data, error } = await adminService.getDashboardStats();
       if (error) throw new Error(error);
@@ -45,7 +38,11 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchAdminStats();
+  }, [fetchAdminStats]);
 
   const statCards = [
     { label: "Total Stores", value: stats.totalStores, trend: "+2 this month", icon: Store, color: "text-blue-600", bg: "bg-blue-50" },

@@ -7,7 +7,7 @@ const loadCart = () => {
   try {
     const savedCart = localStorage.getItem('kirana_cart');
     return savedCart ? JSON.parse(savedCart) : [];
-  } catch (e) {
+  } catch {
     return [];
   }
 };

@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { GoogleMap, useJsApiLoader, Marker, DirectionsRenderer } from '@react-google-maps/api';
 import { supabase } from '../../lib/supabase';
-import { orderService } from '../../lib/supabase/orderService';
 import { ArrowLeft, Phone, ShieldCheck, Clock, MapPin, Loader2, Navigation } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -47,12 +46,7 @@ const Tracking = () => {
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
   });
 
-  useEffect(() => {
-    fetchOrderDetails();
-    subscribeToLocation();
-  }, [orderId]);
-
-  const fetchOrderDetails = async () => {
+  const fetchOrderDetails = useCallback(async () => {
     try {
       const { data, error } = await supabase
         .from('orders')
@@ -67,9 +61,9 @@ const Tracking = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderId]);
 
-  const subscribeToLocation = () => {
+  const subscribeToLocation = useCallback(() => {
     const channel = supabase
       .channel(`tracking_${orderId}`)
       .on('postgres_changes', {
@@ -83,7 +77,13 @@ const Tracking = () => {
       .subscribe();
 
     return () => supabase.removeChannel(channel);
-  };
+  }, [orderId]);
+
+  useEffect(() => {
+    fetchOrderDetails();
+    const cleanup = subscribeToLocation();
+    return () => cleanup && cleanup();
+  }, [fetchOrderDetails, subscribeToLocation]);
 
   // Calculate directions & ETA
   useEffect(() => {
