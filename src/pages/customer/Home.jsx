@@ -52,7 +52,7 @@ const CustomerHome = () => {
         <div className="p-5 space-y-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2 text-green-600 font-black text-xl tracking-tighter uppercase">
-               KIRANA CONNECT
+                LOCAL MART
             </div>
             <div className="flex items-center space-x-1 text-gray-500 text-xs">
               <MapPin size={12} className="text-green-600" />
@@ -74,7 +74,7 @@ const CustomerHome = () => {
 
         {/* Store List */}
         <div className="px-5 py-2">
-          <h2 className="text-lg font-black text-gray-800 mb-4 tracking-tight">Nearby Kirana Stores</h2>
+          <h2 className="text-lg font-black text-gray-800 mb-4 tracking-tight">Nearby Local Mart Stores</h2>
           
           {isLoading ? (
             <div className="space-y-4">
@@ -84,7 +84,7 @@ const CustomerHome = () => {
             <EmptyState 
               type="stores" 
               title="No stores near you" 
-              message="Check back soon! We are constantly onboarding new kirana partners."
+              message="Check back soon! We are constantly onboarding new Local Mart partners."
             />
           ) : (
             <div className="space-y-4">

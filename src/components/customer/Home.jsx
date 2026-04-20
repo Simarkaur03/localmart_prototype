@@ -9,7 +9,7 @@ const CustomerHome = ({ onNavigate, onAddToCart }) => {
       <div className="p-5 space-y-4">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-2 text-primary font-bold text-xl uppercase tracking-tight">
-            <span>Kirana Connect</span>
+            <span>Local Mart</span>
           </div>
           <div className="flex items-center space-x-1 text-gray-500 text-sm">
             <MapPin size={14} className="text-primary" />

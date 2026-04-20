@@ -5,7 +5,7 @@ import { useStore } from './store/useStore';
 import { Loader2 } from 'lucide-react';
 
 // Auth Components
-import Login from './components/auth/Login';
+import LoginPage from './pages/LoginPage';
 import Signup from './components/auth/Signup';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
@@ -16,6 +16,7 @@ import CustomerCart from './pages/customer/Cart';
 import OrderConfirmation from './pages/customer/OrderConfirmation';
 import OrderHistory from './pages/customer/OrderHistory';
 import Tracking from './pages/customer/Tracking';
+import Profile from './pages/customer/Profile';
 
 // Owner Components (Lazy Loaded)
 const OwnerDashboard = lazy(() => import('./pages/owner/Dashboard'));
@@ -35,7 +36,7 @@ const DeliveryEarnings = lazy(() => import('./pages/delivery/Earnings'));
 const PageLoading = () => (
   <div className="flex flex-col items-center justify-center min-h-screen bg-white">
     <Loader2 className="animate-spin text-green-600 mb-4" size={48} />
-    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Kirana Connecting...</p>
+    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Local Mart Connecting...</p>
   </div>
 );
 
@@ -48,26 +49,43 @@ function App() {
   useEffect(() => {
     // Initial session check
     const initAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        setUser(session.user);
-        await fetchProfile(session.user.id);
+      // Safety timeout to prevent infinite loader if Supabase is unreachable
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Auth timeout')), 5000)
+      );
+
+      try {
+        const { data: { session } } = await Promise.race([
+          supabase.auth.getSession(),
+          timeoutPromise
+        ]);
+
+        if (session) {
+          setUser(session.user);
+          await fetchProfile(session.user.id);
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     initAuth();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session) {
-        setUser(session.user);
-        await fetchProfile(session.user.id);
-      } else {
-        setUser(null);
-        setProfile(null);
+      try {
+        if (session) {
+          setUser(session.user);
+          await fetchProfile(session.user.id);
+        } else {
+          setUser(null);
+          setProfile(null);
+        }
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -77,7 +95,7 @@ function App() {
     <Suspense fallback={<PageLoading />}>
       <Routes>
         {/* Public Routes */}
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<Signup />} />
         
         {/* Customer Routes */}
@@ -96,25 +114,24 @@ function App() {
             <CustomerCart />
           </ProtectedRoute>
         } />
+        <Route path="/my-orders" element={
+          <ProtectedRoute allowedRoles={['customer']}>
+            <OrderHistory />
+          </ProtectedRoute>
+        } />
         <Route path="/order-confirmation" element={
           <ProtectedRoute allowedRoles={['customer']}>
             <OrderConfirmation />
           </ProtectedRoute>
         } />
-        <Route path="/my-orders" element={
-          <ProtectedRoute allowedRoles={['customer']}>
-            <OrderHistory />
-          </ProtectedRoute>
-        } />
-
-        <Route path="/my-orders" element={
-          <ProtectedRoute allowedRoles={['customer']}>
-            <OrderHistory />
-          </ProtectedRoute>
-        } />
         <Route path="/tracking/:orderId" element={
           <ProtectedRoute allowedRoles={['customer']}>
             <Tracking />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile" element={
+          <ProtectedRoute allowedRoles={['customer']}>
+            <Profile />
           </ProtectedRoute>
         } />
 

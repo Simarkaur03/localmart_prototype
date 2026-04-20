@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useStore } from '../store/useStore';
+import { useStore } from '../../store/useStore';
 import { Loader2 } from 'lucide-react';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {

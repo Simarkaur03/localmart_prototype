@@ -55,6 +55,8 @@ const Login = () => {
             <div className="relative group">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors" size={20} />
               <input
+                id="email"
+                name="email"
                 type="email"
                 placeholder="Email Address"
                 value={email}
@@ -66,6 +68,8 @@ const Login = () => {
             <div className="relative group">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors" size={20} />
               <input
+                id="password"
+                name="password"
                 type="password"
                 placeholder="Password"
                 value={password}

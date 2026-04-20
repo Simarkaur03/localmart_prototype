@@ -72,7 +72,7 @@ const CustomerCart = () => {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: rzpOrder.amount,
         currency: "INR",
-        name: "Kirana Connect",
+        name: "Local Mart",
         description: "Grocery Order",
         order_id: rzpOrder.id,
         handler: async (response) => {
@@ -193,7 +193,8 @@ const CustomerCart = () => {
           </button>
         </div>
       ) : (
-        <div className="flex-1 p-6 space-y-8          {/* Payment Method */}
+        <div className="flex-1 p-6 space-y-8">
+          {/* Payment Method */}
           <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-5">
              <div className="flex items-center justify-between">
                 <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Payment Method</h3>
@@ -295,7 +296,7 @@ const CustomerCart = () => {
                 </>
               )}
             </button>
-            <p className="text-center text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-6 px-10 leading-relaxed">By placing this order you agree to Kirana Connect's Terms of Service & Privacy Policy</p>
+            <p className="text-center text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-6 px-10 leading-relaxed">By placing this order you agree to Local Mart's Terms of Service & Privacy Policy</p>
           </div>
         </div>
       )}
@@ -328,11 +329,6 @@ const CustomerCart = () => {
               <ShieldCheck size={20} className="text-green-600" />
               <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Secured by Razorpay</span>
            </div>
-        </div>
-      )}
-    </div>
-n>
-          </div>
         </div>
       )}
     </div>

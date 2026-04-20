@@ -8,14 +8,28 @@ export const userService = {
    * Fetches a user's profile by ID.
    */
   getUser: async (userId) => {
+    // Add a race condition to prevent long-hanging queries
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('User fetch timeout')), 5000)
+    );
+
     try {
-      const { data, error } = await supabase
+      const query = supabase
         .from('users')
         .select('id, name, email, phone, role, avatar_url, default_address')
         .eq('id', userId)
-        .single()
+        .single();
+
+      const { data, error } = await Promise.race([query, timeoutPromise]);
       
-      if (error) throw error
+      if (error) {
+        // Detect 'Table Not Found' errors (schema cache error or relation doesn't exist)
+        if (error.code === 'PGRST116' || error.message?.includes('schema cache') || error.code === '42P01') {
+          console.warn('UserService: Users table or profile missing. User ID:', userId);
+          return { data: null, error: 'Table or Profile not found', isTableMissing: error.message?.includes('schema cache') };
+        }
+        throw error;
+      }
       return { data, error: null }
     } catch (error) {
       console.error('UserService.getUser error:', error.message)

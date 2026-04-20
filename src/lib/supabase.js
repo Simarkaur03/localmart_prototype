@@ -7,4 +7,11 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.error('Missing Supabase credentials in .env file')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    navigatorLockAcquireTimeout: 1000,
+  },
+})
+
