@@ -20,7 +20,8 @@ import {
   Wallet,
   Banknote,
   ShieldCheck,
-  X
+  X,
+  History
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import confetti from 'canvas-confetti';
@@ -28,11 +29,34 @@ import confetti from 'canvas-confetti';
 const CustomerCart = () => {
   const { cart, updateCartQuantity, clearCart, profile, user } = useStore();
   const [loading, setLoading] = useState(false);
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [address, setAddress] = useState(profile?.default_address || '');
   const [paymentMethod, setPaymentMethod] = useState('online'); // 'online' or 'cod'
   const [showConflictModal, setShowConflictModal] = useState(false);
   const navigate = useNavigate();
+
+  // Fetch historical orders
+  useEffect(() => {
+    if (user?.id) {
+       fetchRecentOrders();
+    }
+  }, [user]);
+
+  const fetchRecentOrders = async () => {
+    setOrdersLoading(true);
+    try {
+      const { data, error } = await orderService.getOrdersByCustomer(user.id);
+      if (!error && data) {
+        setRecentOrders(data.slice(0, 5));
+      }
+    } catch (err) {
+      console.error('Failed to fetch orders:', err);
+    } finally {
+      setOrdersLoading(false);
+    }
+  };
 
   // Offline detection
   useEffect(() => {
@@ -103,6 +127,7 @@ const CustomerCart = () => {
           
           toast.success('Payment successful & Order placed!');
           clearCart();
+          fetchRecentOrders(); // Refresh history
           navigate('/order-confirmation', { state: { orderId: verified.orderId } });
         },
         prefill: {
@@ -148,6 +173,7 @@ const CustomerCart = () => {
 
       toast.success('Order placed successfully (COD)!');
       clearCart();
+      fetchRecentOrders(); // Refresh history
       navigate('/order-confirmation', { state: { orderId: data.orderId } });
     } catch (error) {
       toast.error(error.message);
@@ -181,157 +207,136 @@ const CustomerCart = () => {
         <h1 className="text-xl font-black text-gray-800 tracking-tighter uppercase">My Cart</h1>
       </div>
 
-      {cart.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
-          <div className="w-28 h-28 bg-white rounded-full flex items-center justify-center text-6xl mb-6 shadow-soft">🛒</div>
-          <h2 className="text-xl font-black text-gray-800 mb-2 tracking-tight">Your cart is empty</h2>
-          <p className="text-gray-400 text-sm mb-10 font-medium">Add some fresh items from nearby stores to get started!</p>
-          <button 
-            onClick={() => navigate('/home')}
-            className="bg-green-600 text-white font-black px-10 py-4 rounded-2xl shadow-xl shadow-green-100 uppercase tracking-widest text-xs active:scale-95 transition-all"
-          >
-            Start Shopping
-          </button>
-        </div>
-      ) : (
-        <div className="flex-1 p-6 space-y-8">
-          {/* Payment Method */}
-          <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-5">
-             <div className="flex items-center justify-between">
-                <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Payment Method</h3>
-                <div className="flex items-center space-x-1 text-green-600">
-                   <ShieldCheck size={12} />
-                   <span className="text-[9px] font-black uppercase tracking-widest">Secure</span>
-                </div>
-             </div>
-             
-             <div className="grid grid-cols-2 gap-4">
-                <button 
-                  onClick={() => setPaymentMethod('online')}
-                  className={`p-5 rounded-3xl border-2 transition-all flex flex-col items-center space-y-2 ${paymentMethod === 'online' ? 'border-green-600 bg-green-50 shadow-inner' : 'border-gray-50 bg-gray-50/50 grayscale opacity-60'}`}
-                >
-                   <CreditCard size={20} className={paymentMethod === 'online' ? 'text-green-600' : 'text-gray-400'} />
-                   <span className={`text-[10px] font-black uppercase tracking-widest ${paymentMethod === 'online' ? 'text-green-700' : 'text-gray-500'}`}>Online Pay</span>
-                </button>
-                <button 
-                   onClick={() => setPaymentMethod('cod')}
-                   className={`p-5 rounded-3xl border-2 transition-all flex flex-col items-center space-y-2 ${paymentMethod === 'cod' ? 'border-green-600 bg-green-50 shadow-inner' : 'border-gray-50 bg-gray-50/50 grayscale opacity-60'}`}
-                >
-                   <Banknote size={20} className={paymentMethod === 'cod' ? 'text-green-600' : 'text-gray-400'} />
-                   <span className={`text-[10px] font-black uppercase tracking-widest ${paymentMethod === 'cod' ? 'text-green-700' : 'text-gray-500'}`}>Pay on Delivery</span>
-                </button>
-             </div>
-
-             {paymentMethod === 'online' && (
-               <div className="flex justify-center space-x-6 pt-2 opacity-40">
-                  <Smartphone size={16} />
-                  <Wallet size={16} />
-                  <div className="text-[8px] font-black uppercase tracking-widest flex items-center">UPI • Cards • Wallets</div>
-               </div>
-             )}
-          </div>
-
-          {/* Coupons */}
-          <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100">
-             <div className="flex items-center space-x-4">
-                <div className="bg-amber-50 p-3 rounded-2xl text-amber-600">
-                   <Trash2 size={20} /> {/* Using Trash2 as placeholder for Tag icon since I don't have it imported, wait, let me use ArrowRight */}
-                </div>
-                <div className="flex-1">
-                   <input 
-                     type="text" 
-                     placeholder="Enter Coupon Code" 
-                     className="w-full text-sm font-black uppercase tracking-widest bg-transparent border-none p-0 focus:ring-0 placeholder:text-gray-300"
-                   />
-                </div>
-                <button className="text-green-600 font-black text-xs uppercase tracking-widest px-4 py-2 hover:bg-green-50 rounded-xl transition-colors">Apply</button>
-             </div>
-          </div>
-
-          {/* Bill Summary */}
-          <div className="bg-white p-8 rounded-[2.5rem] shadow-premium border border-gray-100 space-y-5">
-             <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Bill Details</h3>
-             <div className="flex justify-between text-xs">
-                <span className="text-gray-500 font-bold uppercase tracking-widest">Item Total</span>
-                <span className="font-black text-gray-800">₹{subtotal.toFixed(2)}</span>
-             </div>
-             <div className="flex justify-between text-xs">
-                <span className="text-gray-500 font-bold uppercase tracking-widest">Delivery Fee</span>
-                <span className="font-black text-gray-800">₹{deliveryFee.toFixed(2)}</span>
-             </div>
-             <div className="flex justify-between text-xs text-green-600 bg-green-50 px-3 py-2 rounded-xl border border-green-100">
-                <span className="font-black uppercase tracking-widest text-[9px]">Platform Discount</span>
-                <span className="font-black">-₹{taxes.toFixed(2)}</span>
-             </div>
-             <div className="h-px bg-gray-100 my-2"></div>
-             <div className="flex justify-between items-end">
-                <div>
-                   <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">To Pay</span>
-                   <p className="text-3xl font-black text-gray-900 tracking-tighter">₹{total.toFixed(2)}</p>
-                </div>
-                <div className="flex flex-col items-end">
-                  <span className="text-[8px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Paying via</span>
-                  <div className="bg-gray-100 px-4 py-1.5 rounded-xl text-[10px] font-black text-gray-700 uppercase tracking-widest border border-gray-200 shadow-sm flex items-center space-x-2">
-                     {paymentMethod === 'online' ? <CreditCard size={12}/> : <Banknote size={12}/>}
-                     <span>{paymentMethod === 'online' ? 'Razorpay' : 'COD'}</span>
-                  </div>
-                </div>
-             </div>
-          </div>
-
-          <div className="pb-16 px-2">
+      <div className="flex-1 p-6 space-y-8">
+        {cart.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center text-5xl mb-6 shadow-soft">🛒</div>
+            <h2 className="text-lg font-black text-gray-800 mb-2 tracking-tight">Your cart is empty</h2>
+            <p className="text-gray-400 text-xs mb-8 font-medium">Add fresh items to get started!</p>
             <button 
-              disabled={loading}
-              onClick={handlePlaceOrder}
-              className={`w-full ${paymentMethod === 'online' ? 'bg-slate-900' : 'bg-green-600'} hover:opacity-90 disabled:opacity-70 disabled:cursor-not-allowed text-white font-black py-6 rounded-[2.2rem] shadow-2xl transition-all flex items-center justify-center space-x-4 active:scale-95`}
+              onClick={() => navigate('/home')}
+              className="bg-green-600 text-white font-black px-8 py-3 rounded-2xl shadow-xl shadow-green-100 uppercase tracking-widest text-[10px] active:scale-95 transition-all"
             >
-              {loading ? (
-                <div className="flex items-center space-x-3">
-                  <Loader2 className="animate-spin" size={24} />
-                  <span className="tracking-widest uppercase text-xs">Securely Connecting...</span>
-                </div>
-              ) : (
-                <>
-                  <span className="tracking-widest uppercase text-sm">{paymentMethod === 'online' ? 'CONFIRM & PAY' : 'PLACE ORDER'}</span>
-                  <ArrowRight size={20} />
-                </>
-              )}
+              Start Shopping
             </button>
-            <p className="text-center text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em] mt-6 px-10 leading-relaxed">By placing this order you agree to Local Mart's Terms of Service & Privacy Policy</p>
           </div>
-        </div>
-      )}
+        ) : (
+          <>
+            {/* Payment Method */}
+            <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 space-y-5">
+               <div className="flex items-center justify-between">
+                  <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Payment Method</h3>
+                  <div className="flex items-center space-x-1 text-green-600">
+                     <ShieldCheck size={12} />
+                     <span className="text-[9px] font-black uppercase tracking-widest">Secure</span>
+                  </div>
+               </div>
+               
+               <div className="grid grid-cols-2 gap-4">
+                  <button 
+                    onClick={() => setPaymentMethod('online')}
+                    className={`p-5 rounded-3xl border-2 transition-all flex flex-col items-center space-y-2 ${paymentMethod === 'online' ? 'border-green-600 bg-green-50 shadow-inner' : 'border-gray-50 bg-gray-50/50 grayscale opacity-60'}`}
+                  >
+                     <CreditCard size={20} className={paymentMethod === 'online' ? 'text-green-600' : 'text-gray-400'} />
+                     <span className={`text-[10px] font-black uppercase tracking-widest ${paymentMethod === 'online' ? 'text-green-700' : 'text-gray-500'}`}>Online Pay</span>
+                  </button>
+                  <button 
+                     onClick={() => setPaymentMethod('cod')}
+                     className={`p-5 rounded-3xl border-2 transition-all flex flex-col items-center space-y-2 ${paymentMethod === 'cod' ? 'border-green-600 bg-green-50 shadow-inner' : 'border-gray-50 bg-gray-50/50 grayscale opacity-60'}`}
+                  >
+                     <Banknote size={20} className={paymentMethod === 'cod' ? 'text-green-600' : 'text-gray-400'} />
+                     <span className={`text-[10px] font-black uppercase tracking-widest ${paymentMethod === 'cod' ? 'text-green-700' : 'text-gray-500'}`}>Pay on Delivery</span>
+                  </button>
+               </div>
+            </div>
 
-      {/* Multi-store Conflict Modal */}
-      {showConflictModal && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-end sm:items-center justify-center p-4">
-           <div className="bg-white w-full max-w-md rounded-[3rem] p-10 shadow-2xl animate-in slide-in-from-bottom duration-300">
-              <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center text-3xl mx-auto mb-6">🛒</div>
-              <h2 className="text-2xl font-black text-gray-900 text-center tracking-tighter mb-4">Switch Store?</h2>
-              <p className="text-gray-500 text-center text-sm mb-10 font-medium px-4">Your cart contains items from another store. Adding this will clear your current cart. Continue?</p>
-              <div className="space-y-4">
-                 <button className="w-full bg-slate-900 text-white font-black py-5 rounded-[2rem] uppercase tracking-widest text-xs active:scale-95 transition-all shadow-xl shadow-slate-200">Clear & Add New</button>
-                 <button onClick={() => setShowConflictModal(false)} className="w-full bg-white text-gray-400 font-black py-5 rounded-[2rem] uppercase tracking-widest text-xs active:scale-95 transition-all">Keep Current Cart</button>
-              </div>
-           </div>
-        </div>
-      )}
+            {/* Bill Summary */}
+            <div className="bg-white p-8 rounded-[2.5rem] shadow-premium border border-gray-100 space-y-5">
+               <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Bill Details</h3>
+               <div className="flex justify-between text-xs">
+                  <span className="text-gray-500 font-bold uppercase tracking-widest">Item Total</span>
+                  <span className="font-black text-gray-800">₹{subtotal.toFixed(2)}</span>
+               </div>
+               <div className="flex justify-between text-xs">
+                  <span className="text-gray-500 font-bold uppercase tracking-widest">Delivery Fee</span>
+                  <span className="font-black text-gray-800">₹{deliveryFee.toFixed(2)}</span>
+               </div>
+               <div className="h-px bg-gray-100 my-2"></div>
+               <div className="flex justify-between items-end">
+                  <div>
+                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">To Pay</span>
+                     <p className="text-3xl font-black text-gray-900 tracking-tighter">₹{total.toFixed(2)}</p>
+                  </div>
+                  <button 
+                    disabled={loading}
+                    onClick={handlePlaceOrder}
+                    className="bg-green-600 text-white font-black px-6 py-4 rounded-2xl shadow-xl shadow-green-100 active:scale-95 transition-all text-[10px] uppercase tracking-widest"
+                  >
+                    {loading ? <Loader2 className="animate-spin" size={18} /> : 'Place Order'}
+                  </button>
+               </div>
+            </div>
+          </>
+        )}
 
-      {/* Processing Overlay */}
-      {loading && paymentMethod === 'online' && (
-        <div className="fixed inset-0 bg-white/80 backdrop-blur-md z-[110] flex flex-col items-center justify-center text-center p-12 animate-in fade-in duration-500">
-           <div className="relative mb-10">
-              <div className="absolute inset-0 bg-green-100 rounded-full blur-2xl animate-pulse"></div>
-              <Loader2 className="animate-spin text-green-600 relative z-10" size={64} strokeWidth={1.5} />
-           </div>
-           <h2 className="text-3xl font-black text-gray-900 tracking-tighter mb-4">Processing Payment</h2>
-           <p className="text-gray-400 text-sm font-black uppercase tracking-[0.3em] mb-12">Do not press back or refresh</p>
-           <div className="flex items-center space-x-3 bg-gray-50 px-6 py-3 rounded-2xl border border-gray-100">
-              <ShieldCheck size={20} className="text-green-600" />
-              <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Secured by Razorpay</span>
-           </div>
+        {/* Recent Orders Section */}
+        <div className="pt-8 space-y-6">
+          <div className="flex items-center justify-between px-2">
+             <div className="flex items-center space-x-3">
+                <div className="bg-slate-100 p-2 rounded-xl text-slate-600">
+                   <History size={18} />
+                </div>
+                <h2 className="text-lg font-black text-gray-800 tracking-tighter uppercase">Recent Orders</h2>
+             </div>
+             <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Last 5 Activities</span>
+          </div>
+
+          {ordersLoading ? (
+            <div className="flex justify-center p-12 text-green-600 opacity-40"><Loader2 className="animate-spin" size={32} /></div>
+          ) : recentOrders.length === 0 ? (
+            <div className="bg-white/50 p-10 rounded-[2.5rem] border border-dashed border-gray-200 text-center">
+               <p className="text-gray-400 font-bold text-[10px] uppercase tracking-[0.2em] mb-1">No history yet</p>
+               <p className="text-[9px] text-gray-300 font-black uppercase tracking-widest italic">Start your journey today</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+               {recentOrders.map(order => (
+                 <div key={order.id} className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center justify-between group hover:border-green-600/30 transition-all">
+                    <div className="flex items-center space-x-5">
+                       <div className="w-14 h-14 bg-gray-50 rounded-[1.5rem] flex items-center justify-center text-2xl shadow-inner group-hover:bg-green-50 transition-colors">
+                          {order.status === 'delivered' ? '✅' : order.status === 'cancelled' ? '❌' : '📦'}
+                       </div>
+                       <div>
+                          <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mb-1">#{order.id.split('-')[0]}</p>
+                          <div className="flex items-center space-x-3">
+                             <span className="text-sm font-black text-gray-800 tracking-tighter">₹{order.total_amount}</span>
+                             <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border ${
+                                order.status === 'delivered' ? 'bg-green-50 text-green-600 border-green-100' : 
+                                order.status === 'cancelled' ? 'bg-red-50 text-red-600 border-red-100' : 
+                                'bg-indigo-50 text-indigo-600 border-indigo-100'
+                             }`}>
+                                {order.status === 'delivered' ? 'Completed' : order.status === 'out_for_delivery' ? 'On the Way' : order.status.replace(/_/g, ' ')}
+                             </span>
+                          </div>
+                       </div>
+                    </div>
+                    {['pending', 'accepted', 'out_for_delivery'].includes(order.status) && (
+                       <button 
+                        onClick={() => navigate(`/track/${order.id}`)}
+                        className="bg-slate-900 text-white p-4 rounded-[1.25rem] shadow-xl active:scale-90 transition-all hover:bg-green-600 group/btn"
+                       >
+                          <ArrowRight size={20} className="group-hover/btn:translate-x-1 transition-transform" />
+                       </button>
+                    )}
+                 </div>
+               ))}
+            </div>
+          )}
         </div>
-      )}
+      </div>
+      
+      <p className="text-center text-[9px] font-bold text-gray-300 uppercase tracking-[0.2em] py-10">Secured Hyperlocal Core v1.2</p>
+      
       <CustomerNav />
     </div>
   );

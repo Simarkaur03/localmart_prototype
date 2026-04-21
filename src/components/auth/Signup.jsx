@@ -26,10 +26,13 @@ const Signup = () => {
 
     setLoading(true);
 
+    const cleanEmail = formData.email.trim();
+    const cleanPassword = formData.password.trim();
+
     try {
       const { data, error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
+        email: cleanEmail,
+        password: cleanPassword,
         options: {
           data: {
             name: formData.name,

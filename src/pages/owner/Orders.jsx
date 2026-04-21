@@ -180,25 +180,26 @@ const OwnerOrders = () => {
                          {order.status.replace(/_/g, ' ')}
                       </div>
                       
-                      <div className="flex items-center space-x-2">
-                         {order.status === 'pending' && (
-                            <>
-                               <button onClick={() => updateOrderStatus(order, 'cancelled')} className="p-3 bg-red-50 text-red-600 rounded-xl border border-red-100 hover:bg-red-600 hover:text-white transition-all" title="Reject Order"><XCircle size={18} /></button>
-                               <button onClick={() => updateOrderStatus(order, 'accepted')} className="px-6 py-3 bg-indigo-600 text-white rounded-xl text-[10px] font-black shadow-lg shadow-indigo-100 uppercase tracking-widest transition-all hover:bg-indigo-700">Accept Order</button>
-                            </>
-                         )}
-                         {order.status === 'accepted' && (
-                            <button onClick={() => updateOrderStatus(order, 'out_for_delivery')} className="px-6 py-3 bg-indigo-600 text-white rounded-xl text-[10px] font-black shadow-lg shadow-indigo-100 uppercase tracking-widest transition-all hover:bg-indigo-700">Dispatched Items</button>
-                         )}
-                         {order.status === 'out_for_delivery' && (
-                            <button onClick={() => updateOrderStatus(order, 'delivered')} className="px-6 py-3 bg-green-600 text-white rounded-xl text-[10px] font-black shadow-lg shadow-green-100 uppercase tracking-widest transition-all hover:bg-green-700 underline-none">Confirm Delivery</button>
-                         )}
-                         {(order.status === 'delivered' || order.status === 'cancelled') && (
-                            <div className="bg-slate-50 p-3 rounded-full text-slate-300">
-                               <CheckCircle2 size={24} />
-                            </div>
-                         )}
-                      </div>
+                       <div className="flex items-center space-x-2">
+                          {order.status === 'pending' && (
+                             <>
+                                <button onClick={() => updateOrderStatus(order, 'cancelled')} className="px-6 py-3 bg-red-50 text-red-600 rounded-xl text-[10px] font-black border border-red-100 hover:bg-red-600 hover:text-white transition-all uppercase tracking-widest">Reject Order</button>
+                                <button onClick={() => updateOrderStatus(order, 'accepted')} className="px-6 py-3 bg-green-600 text-white rounded-xl text-[10px] font-black shadow-lg shadow-green-100 uppercase tracking-widest transition-all hover:bg-green-700">Accept Order</button>
+                             </>
+                          )}
+                          {order.status === 'accepted' && (
+                             <button onClick={() => updateOrderStatus(order, 'out_for_delivery')} className="px-6 py-3 bg-indigo-600 text-white rounded-xl text-[10px] font-black shadow-lg shadow-indigo-100 uppercase tracking-widest transition-all hover:bg-indigo-700">Mark as On the Way</button>
+                          )}
+                          {order.status === 'out_for_delivery' && (
+                             <button onClick={() => updateOrderStatus(order, 'delivered')} className="px-6 py-3 bg-emerald-600 text-white rounded-xl text-[10px] font-black shadow-lg shadow-emerald-100 uppercase tracking-widest transition-all hover:bg-emerald-700">Mark Completed</button>
+                          )}
+                          {(order.status === 'delivered' || order.status === 'cancelled') && (
+                             <div className="bg-slate-50 px-6 py-3 rounded-xl border border-slate-100 text-slate-400 flex items-center space-x-2">
+                                <CheckCircle2 size={16} />
+                                <span className="text-[10px] font-black uppercase tracking-widest italic">Order Finalized</span>
+                             </div>
+                          )}
+                       </div>
                    </div>
                 </div>
               </div>

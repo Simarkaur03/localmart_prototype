@@ -13,7 +13,6 @@ const CustomerNav = () => {
   const navItems = [
     { label: 'Home', icon: Home, path: '/home' },
     { label: 'Cart', icon: ShoppingCart, path: '/cart', badge: cartCount },
-    { label: 'Orders', icon: ClipboardList, path: '/my-orders' },
     { label: 'Profile', icon: User, path: '/profile' }
   ];
 

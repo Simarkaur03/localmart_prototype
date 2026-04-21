@@ -18,26 +18,32 @@ const Login = () => {
     setLoading(true);
     setShowBypass(false);
 
+    const cleanEmail = email.trim();
+    const cleanPassword = password.trim();
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: cleanEmail,
+        password: cleanPassword,
       });
 
       if (error) {
+        // ALWAYS offer bypass on ANY error during prototype phase to prevent blockers
+        setShowBypass(true);
         if (error.message.includes('Email not confirmed')) {
-          setShowBypass(true);
-          throw new Error('Email not confirmed yet. Use Demo Bypass to enter?');
+          throw new Error('Email not confirmed yet. Click bypass below to enter.');
         }
         throw error;
       }
 
       await fetchProfile(data.user.id);
       toast.success('Login successful!');
-      redirectUser(data.user.user_metadata.role || 'customer');
+      redirectUser(data.user.user_metadata?.role || 'customer');
       
     } catch (error) {
       toast.error(error.message);
+      // Ensure bypass is visible even for "Invalid credentials" if the user is frustrated
+      setShowBypass(true);
     } finally {
       setLoading(false);
     }
