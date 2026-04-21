@@ -21,7 +21,8 @@ import {
   Loader2,
   CheckCircle2,
   Home as HomeIcon,
-  Briefcase
+  Briefcase,
+  Plus
 } from 'lucide-react';
 
 const Profile = () => {
@@ -130,31 +131,77 @@ const Profile = () => {
           <h1 className="text-xl font-black text-gray-800 tracking-tighter uppercase">Saved Addresses</h1>
         </div>
         
-        <div className="p-6 space-y-4 flex-1 overflow-y-auto no-scrollbar pb-32">
-          {MOCK_ADDRESSES.map((addr) => (
-            <div key={addr.id} className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm flex items-start space-x-6">
-              <div className={`w-12 h-12 ${addr.label === 'Home' ? 'bg-green-50 text-green-600' : addr.label === 'Office' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'} rounded-2xl flex items-center justify-center flex-shrink-0`}>
-                {addr.label === 'Home' ? <HomeIcon size={20} /> : addr.label === 'Office' ? <Briefcase size={20} /> : <MapPin size={20} />}
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-center mb-1">
-                  <h3 className="font-black text-gray-800 text-sm uppercase tracking-widest">{addr.label}</h3>
-                  {addr.is_default && (
-                    <span className="bg-green-100 text-green-700 text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-[0.2em]">Default</span>
-                  )}
+        <div className="flex-1 overflow-y-auto no-scrollbar pb-32">
+          {/* Static Showcase Map */}
+          <div className="h-64 relative overflow-hidden mb-6 group">
+             <div className="absolute inset-0 bg-gray-200 animate-pulse">
+                {/* Fallback pattern while map loads */}
+                <div className="grid grid-cols-8 gap-4 opacity-10 rotate-12 -mt-10 -ml-10">
+                   {[...Array(64)].map((_, i) => <Navigation key={i} size={48} />)}
                 </div>
-                <p className="text-gray-400 text-xs font-bold leading-relaxed">{addr.address}</p>
-                <p className="text-gray-400 text-xs font-black uppercase mt-2 tracking-widest">{addr.city}</p>
-              </div>
-            </div>
-          ))}
-          
-          <button className="w-full border-2 border-dashed border-gray-200 p-6 rounded-[2rem] text-gray-400 font-bold flex flex-col items-center justify-center space-y-2 hover:bg-white hover:border-indigo-600 hover:text-indigo-600 transition-all group">
-             <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center group-hover:bg-indigo-50 transition-all">
-                <Plus size={20} />
              </div>
-             <span className="text-[10px] uppercase tracking-widest font-black">Add New Address</span>
-          </button>
+             
+             {/* Map Component Placeholder - Using a styled div to simulate map layout for prototype speed */}
+             <div className="absolute inset-0 bg-slate-100 flex items-center justify-center">
+                <div className="relative w-full h-full">
+                   {/* Decorative Map Elements */}
+                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                      <div className="w-16 h-16 bg-green-600/20 rounded-full animate-ping"></div>
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-green-600 rounded-full border-4 border-white shadow-xl flex items-center justify-center">
+                         <MapPin size={16} className="text-white" />
+                      </div>
+                   </div>
+                   {/* Mock Streets */}
+                   <div className="absolute top-1/4 left-0 w-full h-2 bg-white/40 skew-y-12"></div>
+                   <div className="absolute top-0 left-1/3 w-2 h-full bg-white/40 -skew-x-12"></div>
+                   <div className="absolute bottom-1/4 left-0 w-full h-3 bg-white/40 -skew-y-6"></div>
+                </div>
+                
+                <div className="absolute bottom-6 left-6 bg-white/90 backdrop-blur px-4 py-2 rounded-xl border border-white/40 shadow-2xl">
+                   <p className="text-[10px] font-black uppercase text-gray-800 tracking-widest leading-none mb-1">Current Zone</p>
+                   <p className="text-[8px] font-black text-green-600 uppercase tracking-widest">Serviceable Area</p>
+                </div>
+             </div>
+          </div>
+
+          <div className="px-6 space-y-6">
+            {/* Quick Add Button at Top */}
+            <button 
+              onClick={() => toast.success('New Address Flow Starting...')}
+              className="w-full bg-indigo-600 text-white font-black py-5 rounded-[1.75rem] shadow-xl shadow-indigo-100 uppercase tracking-widest text-[10px] active:scale-95 transition-all flex items-center justify-center space-x-3 mb-8"
+            >
+               <Plus size={18} />
+               <span>Add Another Address</span>
+            </button>
+
+            <div className="space-y-4">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] ml-2 mb-4">Saved Locations</p>
+              {MOCK_ADDRESSES.map((addr) => (
+                <div key={addr.id} className="bg-white p-6 rounded-[2.5rem] border border-gray-100 shadow-sm flex items-start space-x-6 hover:border-indigo-600/30 transition-colors">
+                  <div className={`w-12 h-12 ${addr.label === 'Home' ? 'bg-green-50 text-green-600' : addr.label === 'Office' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'} rounded-2xl flex items-center justify-center flex-shrink-0`}>
+                    {addr.label === 'Home' ? <HomeIcon size={20} /> : addr.label === 'Office' ? <Briefcase size={20} /> : <MapPin size={20} />}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-center mb-1">
+                      <h3 className="font-black text-gray-800 text-sm uppercase tracking-widest">{addr.label}</h3>
+                      {addr.is_default && (
+                        <span className="bg-green-100 text-green-700 text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-[0.2em]">Default</span>
+                      )}
+                    </div>
+                    <p className="text-gray-400 text-[11px] font-bold leading-relaxed">{addr.address}</p>
+                    <p className="text-gray-400 text-[10px] font-black uppercase mt-2 tracking-widest">{addr.city}</p>
+                  </div>
+                </div>
+              ))}
+              
+              <button className="w-full border-2 border-dashed border-gray-200 p-8 rounded-[2.5rem] text-gray-400 font-bold flex flex-col items-center justify-center space-y-2 hover:bg-white hover:border-indigo-600 hover:text-indigo-600 transition-all group">
+                 <div className="w-10 h-10 bg-gray-50 rounded-full flex items-center justify-center group-hover:bg-indigo-50 transition-all">
+                    <Plus size={20} />
+                 </div>
+                 <span className="text-[10px] uppercase tracking-widest font-black">Add New Address</span>
+              </button>
+            </div>
+          </div>
         </div>
         <CustomerNav />
       </div>
