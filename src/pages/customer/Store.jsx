@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useStoreById, useProducts } from '../../hooks/useQueryHooks';
 import { useStockRealtime } from '../../hooks/useStockRealtime';
 import { useStore } from '../../store/useStore';
+import CustomerNav from '../../components/customer/CustomerNav';
 import { ProductCardSkeleton } from '../../components/ui/Skeleton';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { ArrowLeft, Star, Clock, ShoppingCart, Minus, Plus, Loader2, AlertCircle, AlertTriangle, X } from 'lucide-react';
@@ -211,7 +212,7 @@ const CustomerStore = () => {
 
       {/* Cart Button Overlay */}
       {cartCount > 0 && (
-        <div className="absolute bottom-8 left-8 right-8 z-40 animate-in slide-in-from-bottom-10 duration-500">
+        <div className="absolute bottom-28 left-8 right-8 z-40 animate-in slide-in-from-bottom-10 duration-500">
           <button 
             onClick={() => navigate('/cart')}
             className="w-full bg-slate-900 py-6 px-8 rounded-[2.5rem] flex justify-between items-center shadow-2xl ring-8 ring-white/80 backdrop-blur-sm transition-all active:scale-95 group"
@@ -261,6 +262,7 @@ const CustomerStore = () => {
            </div>
         </div>
       )}
+      <CustomerNav />
     </div>
   );
 };

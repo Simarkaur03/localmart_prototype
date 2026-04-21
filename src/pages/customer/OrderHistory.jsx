@@ -4,6 +4,7 @@ import { orderService } from '../../lib/supabase/orderService';
 import { useCustomerOrders } from '../../hooks/useQueryHooks';
 import { useOrderRealtime } from '../../hooks/useOrderRealtime';
 import { useStore } from '../../store/useStore';
+import CustomerNav from '../../components/customer/CustomerNav';
 import { OrderItemSkeleton } from '../../components/ui/Skeleton';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { ArrowLeft, ClipboardList, Clock, CheckCircle2, Package, Truck, XCircle, Loader2, RefreshCw } from 'lucide-react';
@@ -55,7 +56,7 @@ const OrderHistory = () => {
   };
 
   return (
-    <div className="mobile-container flex flex-col h-full bg-gray-50 no-scrollbar overflow-y-auto">
+    <div className="mobile-container flex flex-col h-full bg-gray-50 no-scrollbar overflow-y-auto pb-32">
       {/* Header */}
       <div className="bg-white px-6 py-5 flex items-center border-b border-gray-100 sticky top-0 z-10">
         <button onClick={() => navigate('/home')} className="mr-5 p-1 hover:bg-gray-100 rounded-full transition-colors">
@@ -128,6 +129,7 @@ const OrderHistory = () => {
           </>
         )}
       </div>
+      <CustomerNav />
     </div>
   );
 };

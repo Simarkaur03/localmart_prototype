@@ -4,6 +4,7 @@ import { orderService } from '../../lib/supabase/orderService';
 import { productService } from '../../lib/supabase/productService';
 import { paymentService } from '../../lib/supabase/paymentService';
 import { useStore } from '../../store/useStore';
+import CustomerNav from '../../components/customer/CustomerNav';
 import { 
   ArrowLeft, 
   MapPin, 
@@ -156,7 +157,7 @@ const CustomerCart = () => {
   };
 
   return (
-    <div className="mobile-container flex flex-col h-full bg-gray-50 no-scrollbar overflow-y-auto relative">
+    <div className="mobile-container flex flex-col h-full bg-gray-50 no-scrollbar overflow-y-auto relative pb-32">
       <div 
         aria-live="polite" 
         className={`bg-slate-900 text-white px-6 py-3 flex items-center justify-between transition-all duration-500 sticky top-0 z-[60] ${isOnline ? 'h-0 opacity-0 overflow-hidden' : 'h-auto opacity-100'}`}
@@ -331,6 +332,7 @@ const CustomerCart = () => {
            </div>
         </div>
       )}
+      <CustomerNav />
     </div>
   );
 };

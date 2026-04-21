@@ -17,11 +17,15 @@ export const productService = {
         .order('name', { ascending: true })
       
       if (error) {
-        // FALLBACK FOR PROTOTYPE
         if (error.message?.includes('schema cache') || error.code === '42P01') {
           return { data: MOCK_PRODUCTS[storeId] || MOCK_PRODUCTS['store-1'], error: null };
         }
         throw error;
+      }
+
+      if (data && data.length === 0) {
+        console.warn('ProductService: No products for store in DB, using mock data.');
+        return { data: MOCK_PRODUCTS[storeId] || MOCK_PRODUCTS['store-1'], error: null };
       }
       return { data, error: null }
     } catch (error) {

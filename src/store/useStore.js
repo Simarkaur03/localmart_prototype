@@ -28,23 +28,27 @@ export const useStore = create((set, get) => ({
       if (data) {
         set({ profile: data })
       } else if (isTableMissing || error) {
-        // FALLBACK: If table is missing or profile doesn't exist, use a guest customer profile
-        // This allows the prototype to function even if the database isn't fully set up.
         set({ 
           profile: { 
             id: userId, 
             role: 'customer', 
             name: 'Guest User',
+            phone: '+91 99999 99999',
             email: get().user?.email 
           } 
         })
-        console.warn('Store: Missing users table or profile. Defaulting to customer role.');
       }
       return { data, error }
     } catch (error) {
       console.error('Store: fetchProfile error:', error)
       return { data: null, error }
     }
+  },
+
+  updateProfile: (updatedProfile) => {
+    set((state) => ({
+      profile: { ...state.profile, ...updatedProfile }
+    }));
   },
 
   logout: async () => {

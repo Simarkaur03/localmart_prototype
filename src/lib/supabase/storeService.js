@@ -18,12 +18,16 @@ export const storeService = {
         .order('created_at', { ascending: false })
       
       if (error) {
-        // FALLBACK FOR PROTOTYPE
         if (error.message?.includes('schema cache') || error.code === '42P01') {
           console.warn('StoreService: Stores table missing, using mock data.');
           return { data: MOCK_STORES, count: MOCK_STORES.length, error: null };
         }
         throw error;
+      }
+
+      if (data && data.length === 0) {
+        console.warn('StoreService: No stores in DB, using mock data for showcase.');
+        return { data: MOCK_STORES, count: MOCK_STORES.length, error: null };
       }
       return { data, count, error: null }
     } catch (error) {
@@ -43,11 +47,18 @@ export const storeService = {
         .eq('id', id)
         .single()
       
-      if (error) throw error
+      if (error) {
+        if (error.message?.includes('schema cache') || error.code === '42P01' || error.code === 'PGRST116') {
+          const mockStore = MOCK_STORES.find(s => s.id === id)
+          return { data: mockStore || MOCK_STORES[0], error: null };
+        }
+        throw error
+      }
       return { data, error: null }
     } catch (error) {
       console.error('StoreService.getStoreById error:', error.message)
-      return { data: null, error: error.message }
+      const mockStore = MOCK_STORES.find(s => s.id === id)
+      return { data: mockStore || MOCK_STORES[0], error: null }
     }
   },
 

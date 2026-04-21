@@ -5,6 +5,7 @@ import { StoreCardSkeleton } from '../../components/ui/Skeleton';
 import { EmptyState } from '../../components/ui/EmptyState';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, MapPin, Star, Home, User, ClipboardList, Loader2, ShoppingBag, ChevronLeft, ChevronRight } from 'lucide-react';
+import CustomerNav from '../../components/customer/CustomerNav';
 import toast from 'react-hot-toast';
 
 const containerVariants = {
@@ -143,21 +144,7 @@ const CustomerHome = () => {
         </div>
       </div>
 
-      {/* Bottom Nav */}
-      <div className="fixed bottom-0 w-[390px] border-t border-gray-100 bg-white/95 backdrop-blur-md px-8 py-4 flex justify-between items-center z-40">
-        <div className="flex flex-col items-center text-green-600 cursor-pointer" onClick={() => navigate('/home')}>
-          <Home size={22} className="mb-0.5" />
-          <span className="text-[10px] font-black uppercase tracking-widest">Home</span>
-        </div>
-        <div className="flex flex-col items-center text-gray-400 cursor-pointer" onClick={() => navigate('/my-orders')}>
-          <ClipboardList size={22} className="mb-0.5" />
-          <span className="text-[10px] font-black uppercase tracking-widest">Orders</span>
-        </div>
-        <div className="flex flex-col items-center text-gray-400 cursor-pointer" onClick={() => navigate('/profile')}>
-          <User size={22} className="mb-0.5" />
-          <span className="text-[10px] font-black uppercase tracking-widest">Profile</span>
-        </div>
-      </div>
+      <CustomerNav />
     </div>
   );
 };
